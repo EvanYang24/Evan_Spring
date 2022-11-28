@@ -103,6 +103,14 @@ public class Person {
             return Period.between(birthDay, LocalDate.now()).getYears(); }
         return -1;
     }
+
+    public int getShoeSize() {
+        return shoesize;
+    }
+
+    public String getHairColortoString() {
+        return haircolor;
+    }
     public static void main(String[] args) {
         // Person empty object
         Person p1 = new Person();

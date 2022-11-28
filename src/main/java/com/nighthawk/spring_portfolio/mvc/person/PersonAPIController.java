@@ -66,7 +66,7 @@ public class PersonAPIController {
             return haircolorToString;
         }
         // Bad ID
-        return "Exrror - Bad ID";       
+        return "Error - Bad ID";       
     }
 
  
