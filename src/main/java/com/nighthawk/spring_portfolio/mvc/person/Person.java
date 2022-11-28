@@ -64,10 +64,10 @@ public class Person {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dob;
     
-    @NotEmpty
+    @Column(unique=false)
     private int shoesize;
 
-    @NotEmpty
+    @Column(unique=false)
     private String haircolor;
 
     /* HashMap is used to store JSON for daily "stats"
@@ -104,8 +104,8 @@ public class Person {
         return -1;
     }
 
-    public int getShoeSize() {
-        return shoesize;
+    public String getShoeSize() {
+        return ("{ \"name\": " + this.name + " ," + "\"ShoeSize\": " + this.shoesize + " }" );
     }
 
     public String getHairColortoString() {
@@ -117,23 +117,12 @@ public class Person {
 
         // using gregorian calendar to initialize tester date object
         Date dob2 = new GregorianCalendar(2006, 9, 21).getTime();
-        Person p2 = new Person("evan.yang8701@gmail.com", "Evan0921", "Evan Yang", dob2,  8.5, "Black");
+        Person p2 = new Person("evan.yang8701@gmail.com", "Evan0921", "Evan Yang", dob2,  8, "Black");
         
         
         System.out.println(p1);
         System.out.println(p2);
      }
-    public Person(String email2, String password2, String name2, Date dob2, double d, String haircolor2) {
-    }
-    public String getFootSizetoString() {
-        return null;
-    }
-    public String getShoeSizetoString() {
-        return null;
-    }
-    public String getHairColorToString() {
-        return null;
-    }
 
 
 }

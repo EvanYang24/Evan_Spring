@@ -46,11 +46,11 @@ public class PersonAPIController {
 
 
      @GetMapping("/getShoeSize/{id}")
-    public String getAge(@PathVariable long id) {
+    public String getShoeSize(@PathVariable long id) {
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {  // Good ID
             Person person = optional.get();  // value from findByID
-            String shoesizeToString = person.getShoeSizetoString();
+            String shoesizeToString = person.getShoeSize();
             return shoesizeToString;
         }
         // Bad ID
@@ -62,7 +62,7 @@ public class PersonAPIController {
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {  // Good ID
             Person person = optional.get();  // value from findByID
-            String haircolorToString = person.getHairColorToString();
+            String haircolorToString = person.getHaircolor();
             return haircolorToString;
         }
         // Bad ID
