@@ -79,7 +79,9 @@ public class PersonAPIController {
                                              @RequestParam("name") String name,
                                              @RequestParam("dob") String dobString,
                                              @RequestParam("shoesize") int shoesize,
-                                             @RequestParam("haircolor") String haircolor) {
+                                             @RequestParam("haircolor") String haircolor,
+                                             @RequestParam("height") Integer height,
+                                             @RequestParam("weight") Integer weight) {
         Date dob;
         try {
             dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
@@ -133,10 +135,16 @@ public class PersonAPIController {
 
             // Set Date and Attributes to SQL HashMap
             Map<String, Map<String, Object>> date_map = new HashMap<>();
+            date_map.putAll(person.getStats());
             date_map.put( (String) stat_map.get("date"), attributeMap );
-            // person.setStats(date_map);  // BUG, needs to be customized to replace if existing or append if new
-            repository.save(person);  // conclude by writing the stats updates
 
+            person.setStats(date_map);  
+            repository.save(person);  
+
+// Set Date and Attributes to SQL HashMap
+date_map.put((String) stat_map.get("date"), attributeMap);
+person.setStats(date_map); // BUG, needs to be customized to replace if existing or append if new
+repository.save(person); // conclude by writing the stats updates
             // return Person with update Stats
             return new ResponseEntity<>(person, HttpStatus.OK);
         }
@@ -145,4 +153,14 @@ public class PersonAPIController {
         
     }
 
+    @PostMapping("/numberofsteps/{id}")
+    public int numberofsteps(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            int numberofsteps = person.numberofsteps();
+            return numberofsteps;  // OK HTTP response: status code, headers, and body
+        }
+        return -1;
+    }
 }

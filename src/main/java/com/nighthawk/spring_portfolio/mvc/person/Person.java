@@ -1,5 +1,4 @@
 package com.nighthawk.spring_portfolio.mvc.person;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -7,7 +6,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,12 +14,10 @@ import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.springframework.data.mongodb.core.schema.JsonSchemaObject.Type.JsonType;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,6 +44,7 @@ public class Person {
 
     // email, password, roles are key attributes to login and authentication
     @NotEmpty
+    
     @Size(min=5)
     @Column(unique=true)
     @Email
@@ -78,9 +75,9 @@ public class Person {
         }
     }
     */
-    //@Type(type="json")
-    //@Column(columnDefinition = "jsonb")
-    //private Map<String,Map<String, Object>> stats = new HashMap<>(); 
+    @Type(type="json")
+    @Column(columnDefinition = "jsonb")
+    private Map<String,Map<String, Object>> stats = new HashMap<>(); 
     
 
     // Constructor used when building object from an API
@@ -123,6 +120,14 @@ public class Person {
         System.out.println(p1);
         System.out.println(p2);
      }
+    public Map<? extends String, ? extends Map<String, Object>> getStats() {
+        return null;
+    }
+    public void setStats(Map<String, Map<String, Object>> date_map) {
+    }
+    public int numberofsteps() {
+        return 0;
+    }
 
 
 }
