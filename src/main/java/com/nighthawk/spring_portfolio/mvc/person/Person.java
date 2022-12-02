@@ -75,10 +75,9 @@ public class Person {
         }
     }
     */
-    @Type(type="json")
-    @Column(columnDefinition = "jsonb")
-    private Map<String,Map<String, Object>> stats = new HashMap<>(); 
-    
+    // @Type(type = "json")
+    // @Column(columnDefinition = "jsonb")
+    // private Map<String, Map<String, Object>> stats = new HashMap<>();    
 
     // Constructor used when building object from an API
     public Person(String email, String password, String name, Date dob, int shoesize, String haircolor) {
