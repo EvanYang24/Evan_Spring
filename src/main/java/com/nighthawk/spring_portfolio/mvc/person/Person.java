@@ -1,4 +1,6 @@
+
 package com.nighthawk.spring_portfolio.mvc.person;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -6,6 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,14 +17,18 @@ import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import com.vladmihalcea.hibernate.type.json.JsonType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
 
 /*
 Person is a POJO, Plain Old Java Object.

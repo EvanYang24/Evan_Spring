@@ -1,133 +1,152 @@
 package com.nighthawk.spring_portfolio.mvc.person;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.springframework.format.annotation.DateTimeFormat;
-import com.vladmihalcea.hibernate.type.json.JsonType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
-/*
-Person is a POJO, Plain Old Java Object.
-First set of annotations add functionality to POJO
---- @Setter @Getter @ToString @NoArgsConstructor @RequiredArgsConstructor
-The last annotation connect to database
---- @Entity
- */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@TypeDef(name="json", typeClass = JsonType.class)
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+import java.text.SimpleDateFormat;
+
+@RestController
+@RequestMapping("/api/person")
 public class PersonAPIController {
-    
-    // automatic unique identifier for Person record
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    // email, password, roles are key attributes to login and authentication
-    @NotEmpty
-    
-    @Size(min=5)
-    @Column(unique=true)
-    @Email
-    private String email;
-
-    @NotEmpty
-    private String password;
-
-    // @NonNull, etc placed in params of constructor: "@NonNull @Size(min = 2, max = 30, message = "Name (2 to 30 chars)") String name"
-    @NonNull
-    @Size(min = 2, max = 30, message = "Name (2 to 30 chars)")
-    private String name;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dob;
-    
-    @Column(unique=false)
-    private int shoesize;
-
-    @Column(unique=false)
-    private String haircolor;
-
-    /* HashMap is used to store JSON for daily "stats"
-    "stats": {
-        "2022-11-13": {
-            "calories": 2200,
-            "steps": 8000
-        }
-    }
+    /*
+    #### RESTful API ####
+    Resource: https://spring.io/guides/gs/rest-service/
     */
-    @Type(type="json")
-    @Column(columnDefinition = "jsonb")
-    private Map<String,Map<String, Object>> stats = new HashMap<>(); 
-    
 
-    // Constructor used when building object from an API
-    public PersonAPIController(String email, String password, String name, Date dob, int shoesize, String haircolor) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.dob = dob;
-        this.shoesize = shoesize;
-        this.haircolor = haircolor;
-    }
-    public String toString(){
-        return ("{ \"email\": " + this.email + ", " + "\"password\": " + this.password + ", " + "\"name\": " + this.name + ", " + "\"dob\": " + this.dob + ", \"shoesize\": " + this.shoesize + ", \"haircolor\": " + this.haircolor + " }" );
+    // Autowired enables Control to connect POJO Object through JPA
+    @Autowired
+    private PersonJpaRepository repository;
+
+    /*
+    GET List of People
+     */
+    @GetMapping("/")
+    public ResponseEntity<List<Person>> getPeople() {
+        return new ResponseEntity<>( repository.findAllByOrderByNameAsc(), HttpStatus.OK);
     }
 
-    // A custom getter to return age from dob attribute
-    public int getAge() {
-        if (this.dob != null) {
-            LocalDate birthDay = this.dob.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            return Period.between(birthDay, LocalDate.now()).getYears(); }
-        return -1;
+    /*
+    GET individual Person using ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Person> getPerson(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            return new ResponseEntity<>(person, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+        }
+        // Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);       
     }
 
-    public String getShoeSize() {
-        return ("{ \"name\": " + this.name + " ," + "\"ShoeSize\": " + this.shoesize + " }" );
+    @GetMapping("/getshoesize/{id}")
+    public String getshoesize(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            String shoesizeToString = person.getShoeSize();
+            return shoesizeToString;
+        }
+        // Bad ID
+        return "Error - Bad ID";       
     }
 
-    public String getHairColortoString() {
-        return haircolor;
-    }
-    public static void main(String[] args) {
-        // Person empty object
-        PersonAPIController p1 = new PersonAPIController();
-
-        // using gregorian calendar to initialize tester date object
-        Date dob2 = new GregorianCalendar(2006, 9, 21).getTime();
-        PersonAPIController p2 = new PersonAPIController("evan.yang8701@gmail.com", "Evan0921", "Evan Yang", dob2,  8, "Black");
-        
-        
-        System.out.println(p1);
-        System.out.println(p2);
-     }
-    public Map<? extends String, ? extends Map<String, Object>> getStats() {
-        return null;
-    }
-    public void setStats(Map<String, Map<String, Object>> date_map) {
-    }
-    public int numberofsteps() {
-        return 0;
+    @GetMapping("/getHairColor/{id}")
+    public String getHairColoString(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            String haircolorToString = person.getHairColortoString();
+            return haircolorToString;
+        }
+        // Bad ID
+        return "Error - Bad ID";       
     }
 
+    /*
+    DELETE individual Person using ID
+     */
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Person> deletePerson(@PathVariable long id) {
+        Optional<Person> optional = repository.findById(id);
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            repository.deleteById(id);  // value from findByID
+            return new ResponseEntity<>(person, HttpStatus.OK);  // OK HTTP response: status code, headers, and body
+        }
+        // Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+    }
+
+    /*
+    POST Aa record by Requesting Parameters from URI
+     */
+    @PostMapping( "/post")
+    public ResponseEntity<Object> postPerson(@RequestParam("email") String email,
+                                             @RequestParam("password") String password,
+                                             @RequestParam("name") String name,
+                                             @RequestParam("dob") String dobString,
+                                             @RequestParam("age") int age,
+                                             @RequestParam("nationality") String nationality) {
+        Date dob;
+        try {
+            dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
+        } catch (Exception e) {
+            return new ResponseEntity<>(dobString +" error; try MM-dd-yyyy", HttpStatus.BAD_REQUEST);
+        }
+        // A person object WITHOUT ID will create a new record with default roles as student
+        Person person = new Person(email, password, name, dob, age, nationality);
+        repository.save(person);
+        return new ResponseEntity<>(email +" is created successfully", HttpStatus.CREATED);
+    }
+
+    /*
+    The personSearch API looks across database for partial match to term (k,v) passed by RequestEntity body
+     */
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> personSearch(@RequestBody final Map<String,String> map) {
+        // extract term from RequestEntity
+        String term = (String) map.get("term");
+
+        // JPA query to filter on term
+        List<Person> list = repository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(term, term);
+
+        // return resulting list and status, error checking should be added
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    /*
+    The personStats API adds stats by Date to Person table
+    */
+    @PostMapping(value = "/setStats", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Person> personStats(@RequestBody final Map<String,Object> stat_map) {
+        // find ID
+        long id=Long.parseLong((String)stat_map.get("id"));
+        Optional<Person> optional = repository.findById((id));
+        if (optional.isPresent()) {  // Good ID
+            Person person = optional.get();  // value from findByID
+            // Extract Attributes from JSON
+            Map<String, Object> attributeMap = new HashMap<>();
+            for (Map.Entry<String,Object> entry : stat_map.entrySet())  {
+                // Add all attribute other thaN "date" to the "attribute_map"
+                if (!entry.getKey().equals("date") && !entry.getKey().equals("id"))
+                    attributeMap.put(entry.getKey(), entry.getValue());
+            }
+            // Set Date and Attributes to SQL HashMap
+            Map<String, Map<String, Object>> date_map = (Map<String, Map<String, Object>>) person.getStats();
+            if (date_map == null) date_map = new HashMap<>();
+            date_map.put( (String) stat_map.get("date"), attributeMap );
+            person.setStats(date_map);  // BUG, needs to be customized to replace if existing or append if new
+            repository.save(person);  // conclude by writing the stats updates
+            // return Person with update Stats
+            return new ResponseEntity<>(person, HttpStatus.OK);
+        }
+        // return Bad ID
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
 }
